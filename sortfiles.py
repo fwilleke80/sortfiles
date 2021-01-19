@@ -124,9 +124,12 @@ def main():
     files_moved, folder_list, error_list = iterate_folder(source_path, dest_path, file_pattern, dry_run)
 
     # Summary: Files moved
-    print("%i files moved into %i folders:" % (files_moved, len(folder_list)))
-    for folder in folder_list:
-        print(folder)
+    if files_moved > 0:
+        print("%i files moved into %i folders:" % (files_moved, len(folder_list)))
+        for folder in folder_list:
+            print(folder)
+    else:
+        print("No files were moved.")
 
     # Summary: Errors occurred
     if len(error_list) > 0:
