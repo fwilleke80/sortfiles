@@ -12,10 +12,11 @@ SCRIPT_TITLE = "SortFiles 1.1"
 # Preset file endings
 ENDINGS_IMAGES = ('.bmp', '.png', '.jpg', '.jpeg', '.tif', '.tiff', '.cr2', '.aae', '.xmp', '.heic')
 ENDINGS_MOVIES = ('.mp4', '.mov', '.avi', '.mpg', '.mpeg', '.mkv')
+ENDINGS_DOCUMENTS = ('.txt', '.rtf', '.doc', '.docx', '.odt', '.pages', '.pdf', '.xls', '.xlsx', '.ods', '.numbers', '.ppt', '.pptx', '.key', '.dif', '.eps', '.html', '.htm')
 PATTERNS = {
-    'images' : ENDINGS_IMAGES,
-    'movies' : ENDINGS_MOVIES,
-    'default' : ENDINGS_IMAGES + ENDINGS_MOVIES
+    'images'   : ENDINGS_IMAGES,
+    'movies'   : ENDINGS_MOVIES,
+    'documents': ENDINGS_DOCUMENTS
 }
 
 
@@ -102,6 +103,8 @@ def main():
     dest_path = args.dest_path if args.dest_path else args.source_path
     if str(args.pattern).lower() in PATTERNS.keys():
         file_pattern = tuple(PATTERNS[args.pattern])
+    elif str(args.pattern).lower() == 'default':
+        file_pattern = PATTERNS['images'] + PATTERNS['movies']
     else:
         file_pattern = tuple(str(args.pattern).split(","))
     dry_run = args.dry
@@ -137,6 +140,8 @@ def main():
         print('')
         for errorString in error_list:
             log.error(errorString)
+
+    print('')
 
 
 if __name__ == "__main__":
