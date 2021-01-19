@@ -6,15 +6,28 @@ import logging
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 log = logging.getLogger()
 
+# Meta
+SCRIPT_TITLE = "SortFiles 1.1"
 
+# Preset file endings
+ENDINGS_IMAGES = ('.bmp', '.png', '.jpg', '.jpeg', '.tif', '.tiff', '.cr2', '.aae', '.xmp', '.heic')
+ENDINGS_MOVIES = ('.mp4', '.mov', '.avi', '.mpg', '.mpeg', '.mkv')
 PATTERNS = {
-    'images' : ('.bmp', '.BMP', '.PNG', '.png', '.JPG', '.jpg', '.jpeg', '.JPEG', '.TIF', '.tif', '.tiff', '.TIFF', '.CR2', '.cr2', '.aae', '.AAE', '.xmp', '.XMP'),
-    'movies' : ('.MP4', '.mp4', '.MOV', '.mov', '.avi', '.AVI', '.mpg', '.MPG', '.mpeg', '.mpeg'),
-    'default' : ('.bmp', '.BMP', '.PNG', '.png', '.JPG', '.jpg', '.jpeg', '.JPEG', '.TIF', '.tif', '.tiff', '.TIFF', '.CR2', '.cr2', '.aae', '.AAE', '.xmp', '.XMP', '.MP4', '.mp4', '.MOV', '.mov', '.avi', '.AVI', '.mpg', '.MPG', '.mpeg', '.mpeg')
+    'images' : ENDINGS_IMAGES,
+    'movies' : ENDINGS_MOVIES,
+    'default' : ENDINGS_IMAGES + ENDINGS_MOVIES
 }
 
 
+def underline(s, c='-'):
+    """Return as many c as s is long
+    """
+    return(c * len(s))
+
+
 def handle_file(file, source_path, dest_path, folder_list, error_list, dry_run):
+    """Move one file
+    """
     source_filename = os.path.join(source_path, file)
     log.debug('Handling file %s...' % source_filename)
 
@@ -55,6 +68,8 @@ def handle_file(file, source_path, dest_path, folder_list, error_list, dry_run):
 
 
 def iterate_folder(source_path, dest_path, file_pattern, dry_run):
+    """Iterate files in a folder, and process them
+    """
     folder_list = []
     error_list = []
     file_count = 0
@@ -62,7 +77,7 @@ def iterate_folder(source_path, dest_path, file_pattern, dry_run):
     # Iterate folder
     for file in os.listdir(source_path):
         # Check file suffix
-        if file.endswith(file_pattern):
+        if file.lower().endswith(file_pattern):
             # Move file
             if handle_file(file, source_path, dest_path, folder_list, error_list, dry_run):
                 # If moved, increase counter
@@ -72,15 +87,17 @@ def iterate_folder(source_path, dest_path, file_pattern, dry_run):
 
 
 def main():
-    # Prepare argument parser
+    """Everything starts here.
+    """
+    # Setup arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("source_path", metavar="SOURCEPATH", type=str, default=None, help="Path to the folder containing the unsorted files")
-    parser.add_argument("--dest", "-d", dest="dest_path", metavar="DESTPATH", type=str, default=None, help="Path to the folder where the resutls should be moved. If not specified, SOURCEPATH will be used.")
-    parser.add_argument("--pattern", "-p", metavar="PATTERN", type=str, default="default", help="Patterns of files that should be moved")
+    parser.add_argument("--dest", "-d", dest="dest_path", metavar="DESTPATH", type=str, default=None, help="Path to the folder where the results should be moved. If not specified, SOURCEPATH will be used.")
+    parser.add_argument("--pattern", "-p", metavar="PATTERN", type=str, default="default", help="Patterns of files that should be moved (either one of %s, or a comma separated list of endings [e.g. '.JPG,.BMP,.TIF'])" % PATTERNS.keys())
     parser.add_argument("--dry", action="store_true", help="Set this to perform a dry run without actually moving any files.")
     args = parser.parse_args()
 
-    # Get arguments
+    # Parse arguments
     source_path = args.source_path
     dest_path = args.dest_path if args.dest_path else args.source_path
     if str(args.pattern).lower() in PATTERNS.keys():
@@ -90,11 +107,14 @@ def main():
     dry_run = args.dry
 
     # Welcome
-    print("SortFiles 1.0\n")
-    print("source_path: %s" % source_path)
-    print("dest_path: %s" % dest_path)
+    print("\n%s" % SCRIPT_TITLE)
+    print("%s" % underline(SCRIPT_TITLE))
+    print("source_path : %s" % source_path)
+    print("dest_path   : %s" % dest_path)
     print("file_pattern: %s" % str(file_pattern))
-    print("dry_run: %s" % dry_run)
+    if dry_run:
+        print("dry_run     : %s\n" % dry_run)
+    print('')
 
     if not os.path.isdir(source_path):
         log.error("%s is not a valid directory!" % source_path)
@@ -114,8 +134,6 @@ def main():
         print('')
         for errorString in error_list:
             log.error(errorString)
-    else:
-        log.info("No errors occurred.")
 
 
 if __name__ == "__main__":
