@@ -101,10 +101,14 @@ def main():
     # Parse arguments
     source_path = args.source_path
     dest_path = args.dest_path if args.dest_path else args.source_path
+
+    # Is pattern the name of a key in the pattern dict?
     if str(args.pattern).lower() in PATTERNS.keys():
         file_pattern = tuple(PATTERNS[args.pattern])
+    # ...or is it 'default'?
     elif str(args.pattern).lower() == 'default':
         file_pattern = PATTERNS['images'] + PATTERNS['movies']
+    # ...or anything else?
     else:
         file_pattern = tuple(str(args.pattern).split(","))
     dry_run = args.dry
@@ -119,6 +123,7 @@ def main():
         print("dry_run     : %s\n" % dry_run)
     print('')
 
+    # Check if path exists
     if not os.path.isdir(source_path):
         log.error("%s is not a valid directory!" % source_path)
         return
@@ -140,7 +145,6 @@ def main():
         print('')
         for errorString in error_list:
             log.error(errorString)
-
     print('')
 
 
