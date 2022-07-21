@@ -75,10 +75,13 @@ def iterate_folder(source_path, dest_path, file_pattern, dry_run):
     error_list = []
     file_count = 0
 
+    # Convert pattern list to a tuple, for use with endswith()
+    pattern_tuple = tuple(file_pattern)
+
     # Iterate folder
     for file in os.listdir(source_path):
         # Check file suffix
-        if file.lower().endswith(file_pattern):
+        if file.lower().endswith(pattern_tuple):
             # Move file
             if handle_file(file, source_path, dest_path, folder_list, error_list, dry_run):
                 # If moved, increase counter
@@ -103,14 +106,20 @@ def main():
     dest_path = args.dest_path if args.dest_path else args.source_path
 
     # Is pattern the name of a key in the pattern dict?
-    if str(args.pattern).lower() in PATTERNS.keys():
-        file_pattern = tuple(PATTERNS[args.pattern])
-    # ...or is it 'default'?
-    elif str(args.pattern).lower() == 'default':
-        file_pattern = PATTERNS['images'] + PATTERNS['movies']
-    # ...or anything else?
+    patterns = args.pattern.split(",")
+    file_pattern = []
+    if str(patterns).lower() == 'default':
+        file_pattern.extend(PATTERNS['images'] + PATTERNS['movies'])
     else:
-        file_pattern = tuple(str(args.pattern).split(","))
+        for pattern in patterns:
+            if str(pattern).lower() in PATTERNS.keys():
+                file_pattern.extend(PATTERNS[pattern])
+            # ...or anything else?
+            else:
+                file_pattern.append(pattern)
+        # ...or is it 'default'?
+        if str(patterns).lower() == 'default':
+            file_pattern.extend(PATTERNS['images'] + PATTERNS['movies'])
     dry_run = args.dry
 
     # Welcome

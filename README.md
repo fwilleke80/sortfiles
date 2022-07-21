@@ -24,5 +24,8 @@ Print the help.
 `python sortfiles.py "/Users/my_name/Pictures/New Pictures" --pattern=images`  
 Sort image files from `"/Users/my_name/Pictures/New Pictures"` into subfolders.
 
+`python sortfiles.py "/Users/my_name/Pictures/New Pictures" --pattern=images,movies`  
+Sort image and movie files from `"/Users/my_name/Pictures/New Pictures"` into subfolders.
+
 `python sortfiles.py "/Users/my_name/Documents/Unsorted Docs" --dest="/Archive/Documents" --pattern=documents`  
 Sort document files from `"/Users/my_name/Documents/Unsorted Docs"` into a folder structure located in `"/Archive/Documents"`.
