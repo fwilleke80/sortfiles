@@ -1,6 +1,5 @@
 import os
 import time
-import shutil
 import logging
 import pathlib
 import argparse
